@@ -1,4 +1,4 @@
-# KVY GitSense
+# CommitPilot
 
 Transform your Git workflow with AI-powered commit messages and PR automation.
 
