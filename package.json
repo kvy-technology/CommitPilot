@@ -1,6 +1,6 @@
 {
-  "name": "kvy-vsc",
-  "displayName": "kvy-vsc",
+  "name": "kvy-gitsense",
+  "displayName": "kvy-gitsense",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -14,10 +14,19 @@
   "contributes": {
     "commands": [
       {
-        "command": "kvy-vsc.helloWorld",
-        "title": "Hello World"
+        "command": "kvy-gitsense.generate-commit-message",
+        "title": "Generate Commit Message"
       }
-    ]
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "kvy-gitsense.generate-commit-message",
+          "when": "scmProvider == git",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",

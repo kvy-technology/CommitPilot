@@ -1,13 +1,13 @@
 # KVY GitSense
 
-Internal VS Code extension for automating our Git workflows.
+Transform your Git workflow with AI-powered commit messages and PR automation.
 
-## 🎯 Features
+## 🎯 What it does
 
 ```mermaid
 graph LR
-    A[Code] --> B[AI Analysis]
-    B --> C[Commit Message]
+    A[Code Changes] --> B[AI Analysis]
+    B --> C[Smart Commits]
     C --> D[PR Creation]
     
     style A fill:#f9f,stroke:#333,stroke-width:2px
@@ -16,7 +16,15 @@ graph LR
     style D fill:#fdd,stroke:#333,stroke-width:2px
 ```
 
-### Current
+## Core Features
 
-- AI-generated commit messages based on your changes
-- PR creation with smart descriptions
+- Generate meaningful commit messages using AI
+- Create PRs with context-aware descriptions
+- Manage your Git workflow directly in VS Code
+
+## Roadmap
+
+- Code convention validation
+- Automated changelog generation
+- Release management
+- Your suggestions welcome!
