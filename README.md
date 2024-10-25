@@ -28,3 +28,14 @@ graph LR
 - Automated changelog generation
 - Release management
 - Your suggestions welcome!
+
+## 🤝 Contributing
+
+Fork the repo
+Create your feature branch
+Submit a PR
+See CONTRIBUTING.md for detailed guidelines.
+
+## 🔗 Links
+
+Built with ❤️ by [KVYTech](https://kvytechnology.com/)
