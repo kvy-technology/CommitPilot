@@ -1,6 +1,6 @@
 {
-  "name": "kvy-gitsense",
-  "displayName": "kvy-gitsense",
+  "name": "commit-pilot",
+  "displayName": "commit-pilot",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -9,23 +9,94 @@
   "categories": [
     "Other"
   ],
+  "icon": "resources/logo.svg",
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "kvy-gitsense.generate-commit-message",
-        "title": "Generate Commit Message"
+        "command": "commit-pilot.generate-commit-message",
+        "title": "CommitPilot: Generate Full Commit Message",
+        "icon": {
+          "light": "./resources/icons/commit-full.svg",
+          "dark": "./resources/icons/commit-full-dark.svg"
+        }
+      },
+      {
+        "command": "commit-pilot.generate-simple-commit-message",
+        "title": "CommitPilot: Generate Simple Commit Message",
+        "icon": {
+          "light": "./resources/icons/commit-simple.svg",
+          "dark": "./resources/icons/commit-simple-dark.svg"
+        }
+      },
+      {
+        "command": "commit-pilot.setApiKey",
+        "title": "Set API Key for CommitPilot"
       }
     ],
     "menus": {
       "scm/title": [
         {
-          "command": "kvy-gitsense.generate-commit-message",
-          "when": "scmProvider == git",
+          "command": "commit-pilot.generate-commit-message",
+          "when": "scmProvider == git && config.commitPilot.showFullCommitButton",
+          "group": "navigation"
+        },
+        {
+          "command": "commit-pilot.generate-simple-commit-message",
+          "when": "scmProvider == git && config.commitPilot.showSimpleCommitButton",
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "CommitPilot",
+      "properties": {
+        "commitPilot.activePreset": {
+          "type": "string",
+          "enum": [
+            "KVY"
+          ],
+          "enumDescriptions": [
+            "Default conventional commit style of KVYTech"
+          ],
+          "default": "KVY",
+          "description": "Select the preset to use for commit message generation"
+        },
+        "commitPilot.showFullCommitButton": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the full commit message generation button"
+        },
+        "commitPilot.showSimpleCommitButton": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the simple commit message generation button"
+        },
+        "commitPilot.useLearningMode": {
+          "type": "boolean",
+          "default": true,
+          "title": "Enable Learning Mode (Experimental)",
+          "description": "Enable learning mode to improve commit messages based on repository history"
+        },
+        "commitPilot.provider": {
+          "type": "string",
+          "enum": [
+            "openai",
+            "groq"
+          ],
+          "enumDescriptions": [
+            "OpenAI",
+            "Groq"
+          ],
+          "default": "groq",
+          "description": "Select the AI provider for generating commit messages"
+        },
+        "commitPilot.apiKey": {
+          "type": "string",
+          "description": "API key for the selected provider"
+        }
+      }
     }
   },
   "scripts": {
@@ -43,17 +114,27 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.94.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
+    "@types/vscode": "^1.94.0",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "^9.13.0",
-    "esbuild": "^0.24.0",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.6.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
   },
-  "packageManager": "pnpm@9.11.0"
+  "packageManager": "pnpm@9.11.0",
+  "dependencies": {
+    "@langchain/core": "^0.3.15",
+    "@langchain/groq": "^0.1.2",
+    "@langchain/openai": "^0.3.11",
+    "dotenv": "^16.4.5",
+    "langchain": "^0.3.4",
+    "zod": "^3.23.8"
+  }
 }
