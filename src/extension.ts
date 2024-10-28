@@ -1,19 +1,26 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+import 'dotenv/config';
 import * as vscode from 'vscode';
+import { generateFullCommitMessage, generateSimpleCommitMessage } from './commands/generate-commit-message';
+import { COMMANDS } from './constants/commands';
+import { setApiKey } from './commands/set-api-key';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	const fullCommitDisposable = vscode.commands.registerCommand(
+		COMMANDS.GENERATE_FULL_COMMIT_MESSAGE,
+		generateFullCommitMessage
+	)
 
-	const disposable = vscode.commands.registerCommand('kvy-gitsense.generate-commit-message', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from kvy-vsc!');
-	});
+	const simpleCommitDisposable = vscode.commands.registerCommand(
+		COMMANDS.GENERATE_SIMPLE_COMMIT_MESSAGE,
+		generateSimpleCommitMessage
+	)
 
-	context.subscriptions.push(disposable);
+	const setApiKeyDisposable = vscode.commands.registerCommand(
+		COMMANDS.SET_API_KEY,
+		setApiKey
+	)
+
+	context.subscriptions.push(fullCommitDisposable, simpleCommitDisposable, setApiKeyDisposable)
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() { }
