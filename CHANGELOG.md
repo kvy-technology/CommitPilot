@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.1] - 2024-10-28
+
 ### Added
 
 - Commit message generation with AI
