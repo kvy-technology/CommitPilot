@@ -21,3 +21,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Changed
 
 - Updated extension name to "CommitPilot"
+
+## [0.0.0] - 2024-10-28
+
+- Initial release

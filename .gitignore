@@ -5,3 +5,4 @@ node_modules
 *.vsix
 .env
 /src/services/llm/langsmith.ts
+release-it.sh
