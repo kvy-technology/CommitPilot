@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Changed
+
+- Updated README.md for better documentation
+
 ## [0.0.1] - 2024-10-28
 
 ### Added
