@@ -9,18 +9,24 @@ graph LR
     A[Code Changes] --> B[AI Analysis]
     B --> C[Smart Commits]
     C --> D[PR Creation]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#dfd,stroke:#333,stroke-width:2px
-    style D fill:#fdd,stroke:#333,stroke-width:2px
+
+    style A
+    style B
+    style C
+    style D
 ```
 
 ## Core Features
 
-- Generate meaningful commit messages using AI
-- Create PRs with context-aware descriptions
-- Manage your Git workflow directly in VS Code
+### Generate meaningful commit messages using AI
+
+Generate full / simple commit messages based on your code changes
+
+![Full Commit Message](./docs/generated-commit-messages.gif)
+
+### Create PRs with context-aware descriptions
+
+- Coming soon
 
 ## Roadmap
 

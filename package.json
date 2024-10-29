@@ -12,7 +12,7 @@
     "url": "https://github.com/kvy-technology/CommitPilot.git"
   },
   "engines": {
-    "vscode": "^1.94.0"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Other"
@@ -89,14 +89,16 @@
         "commitPilot.provider": {
           "type": "string",
           "enum": [
+            "default",
             "openai",
             "groq"
           ],
           "enumDescriptions": [
+            "Default (Free but has some limit)",
             "OpenAI",
             "Groq"
           ],
-          "default": "groq",
+          "default": "default",
           "description": "Select the AI provider for generating commit messages"
         },
         "commitPilot.apiKey": {
