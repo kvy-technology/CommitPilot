@@ -2,20 +2,6 @@
 
 Transform your Git workflow with AI-powered commit messages and PR automation.
 
-## 🎯 What it does
-
-```mermaid
-graph LR
-    A[Code Changes] --> B[AI Analysis]
-    B --> C[Smart Commits]
-    C --> D[PR Creation]
-
-    style A
-    style B
-    style C
-    style D
-```
-
 ## Core Features
 
 ### Generate meaningful commit messages using AI
