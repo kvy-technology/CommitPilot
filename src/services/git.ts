@@ -14,8 +14,9 @@ const getWorkspaceFolder = (): string => {
 
 export const execGitCommand = async (command: string): Promise<string> => {
   const cwd = getWorkspaceFolder()
-  console.log('CommitPilot: Executing git command:', cwd)
+  console.log('CommitPilot: Executing git command:', command)
   const { stdout } = await execAsync(`git ${command}`, { cwd })
+  console.log(`CommitPilot: Output: ${stdout}`)
   return stdout.trim()
 }
 
@@ -50,4 +51,27 @@ export const getRecentCommits = async (
         message: messageLines.join('\n').trim(),
       }
     })
+}
+
+export const getAllBranches = async (): Promise<string[]> => {
+  const output = await execGitCommand('branch --format="%(refname:short)"')
+  return output.split('\n').filter(Boolean)
+}
+
+
+export const getDetailedBranchDiff = async (baseBranch: string): Promise<Array<{ hash: string; message: string; diff: string }>> => {
+  const commitHashes = await execGitCommand(`log ${baseBranch}...HEAD --format=%H`)
+  const commits = []
+
+  for (const hash of commitHashes.split('\n').filter(Boolean)) {
+    const message = await execGitCommand(`log --pretty=format:%B -n 1 ${hash}`)
+    const diff = await execGitCommand(`diff ${hash}^!`)
+    commits.push({
+      hash,
+      message: message.trim(),
+      diff: diff.trim()
+    })
+  }
+
+  return commits
 }

@@ -38,6 +38,14 @@
         }
       },
       {
+        "command": "commit-pilot.generate-pr-description",
+        "title": "CommitPilot: Generate PR Description",
+        "icon": {
+          "light": "./resources/icons/pr-description.svg",
+          "dark": "./resources/icons/pr-description-dark.svg"
+        }
+      },
+      {
         "command": "commit-pilot.setApiKey",
         "title": "Set API Key for CommitPilot"
       }
@@ -52,6 +60,11 @@
         {
           "command": "commit-pilot.generate-simple-commit-message",
           "when": "scmProvider == git && config.commitPilot.showSimpleCommitButton",
+          "group": "navigation"
+        },
+        {
+          "command": "commit-pilot.generate-pr-description",
+          "when": "scmProvider == git",
           "group": "navigation"
         }
       ]
