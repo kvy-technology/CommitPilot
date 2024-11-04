@@ -1,4 +1,4 @@
-export type LLMProvider = 'groq' | 'openai'
+export type LLMProvider = 'groq' | 'openai' | 'googleGenAI'
 export type ModelName = string
 
 export interface LLMConfig {

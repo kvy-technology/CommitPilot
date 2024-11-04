@@ -21,3 +21,7 @@ export const simpleCommitSchema = z.object({
   type: commitTypeSchema,
   description: commitDescriptionSchema,
 })
+
+export const PRTitleSchema = z.object({
+  title: z.string().describe('Provide a concise and descriptive title for the pull request'),
+})

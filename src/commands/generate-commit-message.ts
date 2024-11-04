@@ -1,3 +1,14 @@
+/**
+ * Commit Message Generation Commands
+ * 
+ * Provides AI-powered commit message generation in two formats:
+ * 1. Full format: type, description, and detailed body
+ * 2. Simple format: type and description only
+ * 
+ * Uses staged changes to generate contextually relevant messages
+ * following conventional commit standards.
+ */
+
 import * as vscode from 'vscode'
 import { getStagedDiff, getStagedFiles } from '../services/git'
 import { LLMService } from '../services/llm'
@@ -5,7 +16,12 @@ import { writeCommitMessageToSCM } from '../services/vscode-scm'
 import { KVY_PRESET } from '../constants/preset'
 import { fullCommitSchema, simpleCommitSchema } from '../constants/schema'
 
-
+/**
+ * Generates a detailed commit message with type, description, and body
+ * - Analyzes staged changes
+ * - Uses AI to generate structured message
+ * - Updates SCM input box with result
+ */
 export async function generateFullCommitMessage() {
   try {
     const diff = await getStagedDiff()
@@ -19,12 +35,14 @@ export async function generateFullCommitMessage() {
 
     const llmService = new LLMService()
 
+    // Generate structured commit message using AI
     const result = await llmService.generate({
-      prompt: KVY_PRESET.PROMPT,
+      prompt: KVY_PRESET.GENERATE_COMMIT_PROMPT,
       schema: fullCommitSchema,
       input: { diff }
     })
 
+    // Format message with conventional commit structure
     const message = `${result.type}: ${result.description}`
     const commitMessage = result.body
       ? `${message}\n\n${result.body.map((item: string) => `- ${item}`).join('\n')}`
@@ -37,6 +55,12 @@ export async function generateFullCommitMessage() {
   }
 }
 
+/**
+ * Generates a simple commit message with type and description only
+ * - Ideal for small, straightforward changes
+ * - Follows conventional commit format
+ * - Updates SCM input box with result
+ */
 export async function generateSimpleCommitMessage() {
   try {
     const diff = await getStagedDiff()
@@ -50,8 +74,9 @@ export async function generateSimpleCommitMessage() {
 
     const llmService = new LLMService()
 
+    // Generate concise commit message using AI
     const result = await llmService.generate({
-      prompt: KVY_PRESET.PROMPT,
+      prompt: KVY_PRESET.GENERATE_COMMIT_PROMPT,
       schema: simpleCommitSchema,
       input: { diff }
     })
