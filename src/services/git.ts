@@ -37,11 +37,26 @@ export const execGitCommand = async (command: string): Promise<string> => {
 }
 
 /**
- * Gets diff of staged changes
+ * Gets diff of staged changes with special handling for lock files
  * @returns Diff output as string
  */
 export const getStagedDiff = async (): Promise<string> => {
-  return execGitCommand('diff --cached')
+  const stagedFiles = await execGitCommand('diff --cached --name-only')
+
+  const files = stagedFiles.split('\n').filter(Boolean)
+
+  let diffOutput = ''
+
+  for (const file of files) {
+    if (file.endsWith('lock.json') || file.endsWith('.lock') || file.endsWith('lock.yaml')) {
+      diffOutput += `${file}: [Lock file changes detected]\n`
+    } else {
+      const fileDiff = await execGitCommand(`diff --cached ${file}`)
+      diffOutput += fileDiff + '\n'
+    }
+  }
+
+  return diffOutput.trim()
 }
 
 /**
