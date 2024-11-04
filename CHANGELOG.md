@@ -22,6 +22,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Added comments to all functions and classes in the codebase
 
+### Fixed
+
+- Skipped the lock file (e.g. package-lock.json) when retrieving the diff output
+
 ## [0.0.2] - 2024-10-29
 
 ### Changed
