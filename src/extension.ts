@@ -15,6 +15,7 @@ import {
 import { COMMANDS } from './constants/commands'
 import { setApiKey } from './commands/set-api-key'
 import { generatePRDescription } from './commands/generate-pr-description'
+import { openSettings } from './commands/open-settings'
 
 /**
  * Extension Activation Handler
@@ -42,11 +43,18 @@ export function activate(context: vscode.ExtensionContext) {
 		generatePRDescription
 	)
 
+	// Register Open Settings command
+	const openSettingsDisposable = vscode.commands.registerCommand(
+		COMMANDS.OPEN_SETTINGS,
+		openSettings
+	)
+
 	// Add all disposables to extension context for proper cleanup
 	context.subscriptions.push(
 		fullCommitDisposable,
 		simpleCommitDisposable,
 		setApiKeyDisposable,
+		openSettingsDisposable,
 		generatePRDescriptionDisposable
 	)
 }

@@ -48,6 +48,10 @@
       {
         "command": "commit-pilot.setApiKey",
         "title": "Set API Key for CommitPilot"
+      },
+      {
+        "command": "commit-pilot.openSettings",
+        "title": "CommitPilot: Open Settings"
       }
     ],
     "menus": {
