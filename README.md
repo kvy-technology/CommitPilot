@@ -35,6 +35,8 @@ Generate comprehensive PR descriptions automatically with:
   - Custom template file path configuration
   - Flexible template customization options
 
+![CleanShot 2024-11-04 at 14 41 40](https://github.com/user-attachments/assets/5745d0fa-be21-4872-ba88-591546a1464b)
+
 ## Roadmap
 
 - ~~Create PRs with context-aware descriptions~~ 🚀 (Done in v0.1.0)
