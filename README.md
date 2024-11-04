@@ -59,6 +59,8 @@ CommitPilot offers several configuration options to customize your experience:
 
 You can modify these settings through VS Code's settings UI or directly in your settings.json file.
 
+![CleanShot 2024-11-04 at 14 45 06](https://github.com/user-attachments/assets/5022cb00-e513-4568-bbe1-54f4158bbb1d)
+
 ## Roadmap
 
 - ~~Create PRs with context-aware descriptions~~ 🚀 (Done in v0.1.0)
