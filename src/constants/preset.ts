@@ -48,6 +48,13 @@ Your goal is to encourage self-reliance and comprehension through interactive su
 
 The description should provide reviewers with a comprehensive understanding of the pull request's purpose and impact. Use simple and straightforward words, avoiding buzzwords and overly complex vocabulary. Keep it concise.
 
+Requirements:
+- Use passive voice consistently
+- Avoid first-person pronouns (I, we, my, our)
+- Focus on what changed, not who changed it
+- Maintain technical accuracy and objectivity
+- Use factual, neutral language throughout
+
 Git Changes:
 \`\`\`
 {diff}

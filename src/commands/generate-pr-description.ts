@@ -11,6 +11,13 @@ import {
 import { LLMService } from '../services/llm'
 import { openPRCreationPage } from '../services/vscode-scm'
 import { PRTitleSchema } from '../constants/schema'
+import { DEFAULT_PROMPTS } from '../constants/llm'
+
+enum PRFeedbackOption {
+  SUBMIT = 'Submit PR',
+  IMPROVE = 'Improve Description',
+  CANCEL = 'Cancel'
+}
 
 export async function generatePRDescription() {
   const baseBranch = await selectBaseBranch()
@@ -18,81 +25,100 @@ export async function generatePRDescription() {
     return
   }
 
-  vscode.window.showInformationMessage(`Generating PR description for ${baseBranch}...`)
+  vscode.window.showInformationMessage(`Commit Pilot: Analyzing code changes in ${baseBranch}...`)
 
   const diff = await getDetailedBranchDiff(baseBranch)
   const template = await getPRTemplate()
+
   const llm = new LLMService()
   const prompt = template || KVY_PRESET.GENERATE_PR_DESCRIPTION_PROMPT
 
-  let description = await llm.generate({
-    prompt,
-    input: {
-      diff: JSON.stringify(diff, null, 2)
-    },
-    disableExamples: true
-  })
+  vscode.window.showInformationMessage('Commit Pilot: Generating initial PR description...')
 
-  // Create the document once
-  const document = await vscode.workspace.openTextDocument({
-    content: description,
-    language: 'markdown'
-  })
-  const editor = await vscode.window.showTextDocument(document)
-
-  let isDescriptionApproved = false
-  while (!isDescriptionApproved) {
-    // Update existing document content
-    await editor.edit(editBuilder => {
-      const fullRange = new vscode.Range(
-        document.positionAt(0),
-        document.positionAt(document.getText().length)
-      )
-      editBuilder.replace(fullRange, description)
+  try {
+    let description = await llm.generate({
+      prompt,
+      input: {
+        diff: JSON.stringify(diff, null, 2)
+      },
+      disableExamples: true
     })
 
-    const feedback = await vscode.window.showQuickPick(['OK', 'Refine'], {
-      placeHolder: 'Is this description good enough?'
+    vscode.window.showInformationMessage('Commit Pilot: Opening description for review...')
+    const document = await vscode.workspace.openTextDocument({
+      content: description,
+      language: 'markdown'
     })
+    const editor = await vscode.window.showTextDocument(document)
 
-    if (feedback === 'OK') {
-      isDescriptionApproved = true
-    } else if (feedback === 'Refine') {
-      const refinementInput = await vscode.window.showInputBox({
-        prompt: 'What would you like to improve in the description?',
-        placeHolder: 'Enter your feedback for refinement'
+    let isDescriptionApproved = false
+    while (!isDescriptionApproved) {
+      await editor.edit(editBuilder => {
+        const fullRange = new vscode.Range(
+          document.positionAt(0),
+          document.positionAt(document.getText().length)
+        )
+        editBuilder.replace(fullRange, description)
       })
 
-      if (refinementInput) {
-        description = await llm.generate({
-          prompt: `Please refine the following PR description based on this feedback: ${refinementInput}\n\nCurrent description:\n${description}`,
-          input: {
-            diff: JSON.stringify(diff, null, 2)
-          },
-          disableExamples: true
+      const feedback = await vscode.window.showQuickPick(
+        [PRFeedbackOption.SUBMIT, PRFeedbackOption.IMPROVE, PRFeedbackOption.CANCEL],
+        {
+          placeHolder: 'How would you like to proceed with this PR description?'
+        }
+      )
+
+      if (feedback === PRFeedbackOption.SUBMIT) {
+        isDescriptionApproved = true
+        vscode.window.showInformationMessage('Commit Pilot: Description approved! Generating PR title...')
+      } else if (feedback === PRFeedbackOption.IMPROVE) {
+        const refinementInput = await vscode.window.showInputBox({
+          prompt: 'What would you like to improve in the description?',
+          placeHolder: 'Enter your feedback for refinement'
         })
+
+        if (refinementInput) {
+          vscode.window.showInformationMessage('Commit Pilot: Refining description based on feedback...')
+          description = await llm.generate({
+            prompt: DEFAULT_PROMPTS.REFINE_PR_DESCRIPTION_PROMPT,
+            input: {
+              refinementInput,
+              description
+            },
+            disableExamples: true
+          })
+        }
+      } else if (feedback === PRFeedbackOption.CANCEL) {
+        vscode.window.showInformationMessage('Commit Pilot: PR description generation cancelled.')
+        return
       }
     }
+
+    const title = await llm.generate({
+      prompt: KVY_PRESET.GENERATE_PR_TITLE_PROMPT,
+      schema: PRTitleSchema,
+      input: {
+        description
+      },
+      disableExamples: true
+    })
+
+    vscode.window.showInformationMessage('Commit Pilot: Opening PR creation page...')
+    await openPRCreationPage(description, baseBranch, title.title)
+    vscode.window.showInformationMessage('Commit Pilot: PR description and title generated successfully! Ready to create PR.')
+  } catch (error) {
+    console.error(error)
+    vscode.window.showErrorMessage(`Error generating PR description: ${error}`)
   }
-
-  const title = await llm.generate({
-    prompt: KVY_PRESET.GENERATE_PR_TITLE_PROMPT,
-    schema: PRTitleSchema,
-    input: {
-      description
-    },
-    disableExamples: true
-  })
-
-  await openPRCreationPage(description, baseBranch, title.title)
-  vscode.window.showInformationMessage('PR description generated successfully!')
 }
+
 async function getPRTemplate(): Promise<string | null> {
   try {
     const repoRoot = await getRepoRoot()
     const templatePath = path.join(repoRoot, '.github', 'PULL_REQUEST_TEMPLATE.md')
     const template = await fs.readFile(templatePath, 'utf-8')
-    return template
+
+    return DEFAULT_PROMPTS.GET_PR_TEMPLATE_PROMPT.replace('{template}', template)
   } catch {
     return null
   }
