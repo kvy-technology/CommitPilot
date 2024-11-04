@@ -37,6 +37,28 @@ Generate comprehensive PR descriptions automatically with:
 
 ![CleanShot 2024-11-04 at 14 41 40](https://github.com/user-attachments/assets/5745d0fa-be21-4872-ba88-591546a1464b)
 
+## Configuration
+
+CommitPilot offers several configuration options to customize your experience:
+
+### Commit Message Generation
+
+- `commitPilot.activePreset`: Select commit message style preset (Default: KVY conventional commit style)
+- `commitPilot.showFullCommitButton`: Toggle visibility of full commit message button in SCM view
+- `commitPilot.showSimpleCommitButton`: Toggle visibility of simple commit message button in SCM view
+- `commitPilot.useLearningMode`: Enable experimental learning mode to improve commit messages based on repository history
+
+### AI Provider Settings
+
+- `commitPilot.provider`: Choose your AI provider (OpenAI or Groq)
+- `commitPilot.apiKey`: Set your API key for the selected provider
+
+### PR Description Settings
+
+- `commitPilot.customPRTemplate`: Specify path to your custom PR template markdown file (relative to workspace root)
+
+You can modify these settings through VS Code's settings UI or directly in your settings.json file.
+
 ## Roadmap
 
 - ~~Create PRs with context-aware descriptions~~ 🚀 (Done in v0.1.0)
