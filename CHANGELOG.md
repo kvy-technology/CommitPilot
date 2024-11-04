@@ -6,6 +6,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Added
+
+- Added PR description generation
+  - Generate PR description based on the git diff output
+  - Create PRs with context-aware descriptions
+  - Allow users to refine the description until they are satisfied and ready to submit
+
+### Changed
+
+- Added comments to all functions and classes in the codebase
+
 ## [0.0.2] - 2024-10-29
 
 ### Changed
