@@ -20,7 +20,7 @@ export async function generateFullCommitMessage() {
     const llmService = new LLMService()
 
     const result = await llmService.generate({
-      prompt: KVY_PRESET.PROMPT,
+      prompt: KVY_PRESET.GENERATE_COMMIT_PROMPT,
       schema: fullCommitSchema,
       input: { diff }
     })
@@ -51,7 +51,7 @@ export async function generateSimpleCommitMessage() {
     const llmService = new LLMService()
 
     const result = await llmService.generate({
-      prompt: KVY_PRESET.PROMPT,
+      prompt: KVY_PRESET.GENERATE_COMMIT_PROMPT,
       schema: simpleCommitSchema,
       input: { diff }
     })
