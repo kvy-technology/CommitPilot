@@ -4,7 +4,17 @@ Transform your Git workflow with AI-powered commit messages and PR automation.
 
 ## Core Features
 
-### Generate meaningful commit messages using AI
+### Generate commit messages
+
+Transform your staged changes into structured commit messages with:
+
+- Two generation modes:
+  - Full format: Includes commit type, description, and detailed bullet-point body
+  - Simple format: Concise type and description for straightforward changes
+- Follows conventional commit standards
+- Automatic analysis of staged files
+- Support for multiple AI providers (OpenAI, Groq)
+- Learning mode to improve messages based on repository history
 
 Generate full / simple commit messages based on your code changes
 
@@ -28,7 +38,6 @@ Generate comprehensive PR descriptions automatically with:
 ## Roadmap
 
 - ~~Create PRs with context-aware descriptions~~ 🚀 (Done in v0.1.0)
-- Code convention validation
 - Automated changelog generation
 - Release management
 - Your suggestions welcome!
