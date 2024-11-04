@@ -9,10 +9,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Added
 
 - Added PR description generation
+
   - Generate PR description based on the git diff output
   - Create PRs with context-aware descriptions
   - Allow users to refine the description until they are satisfied and ready to submit
   - Allow users to specify a custom PR template
+
+- Support for Google GenAI provider (Google Gemini Flash)
+- Added Open Settings command to open extension settings faster
 
 ### Changed
 
