@@ -67,11 +67,10 @@ export const getDetailedBranchDiff = async (baseBranch: string): Promise<Array<{
     const message = await execGitCommand(`log --pretty=format:%B -n 1 ${hash}`)
     const diff = await execGitCommand(`diff ${hash}^!`)
     commits.push({
-      hash,
+      hash: hash.substring(0, 4),
       message: message.trim(),
       diff: diff.trim()
     })
   }
-
   return commits
 }
