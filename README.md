@@ -16,11 +16,18 @@ Sample:
 
 ### Create PRs with context-aware descriptions
 
-- Coming soon
+Generate comprehensive PR descriptions automatically with:
+
+- Smart analysis of git diff changes
+- Interactive refinement workflow until description is perfect
+- Support for custom PR templates:
+  - Default GitHub PR template
+  - Custom template file path configuration
+  - Flexible template customization options
 
 ## Roadmap
 
-- Create PRs with context-aware descriptions
+- ~~Create PRs with context-aware descriptions~~ 🚀 (Done in v0.1.0)
 - Code convention validation
 - Automated changelog generation
 - Release management
