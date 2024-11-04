@@ -102,17 +102,20 @@
         "commitPilot.provider": {
           "type": "string",
           "enum": [
-            "default",
             "openai",
             "groq"
           ],
           "enumDescriptions": [
-            "Default (Free but has some limit)",
             "OpenAI",
             "Groq"
           ],
           "default": "default",
           "description": "Select the AI provider for generating commit messages"
+        },
+        "commitPilot.customPullRequestTemplate": {
+          "type": "string",
+          "default": "",
+          "description": "Path to custom pull request template markdown file (relative to workspace root)"
         },
         "commitPilot.apiKey": {
           "type": "string",

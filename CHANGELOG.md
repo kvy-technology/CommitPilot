@@ -12,6 +12,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - Generate PR description based on the git diff output
   - Create PRs with context-aware descriptions
   - Allow users to refine the description until they are satisfied and ready to submit
+  - Allow users to specify a custom PR template
 
 ### Changed
 

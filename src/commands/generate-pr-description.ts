@@ -145,15 +145,29 @@ export async function generatePRDescription() {
 }
 
 /**
- * Attempts to load PR template from repository
- * Returns formatted prompt with template if found, null otherwise
+ * Attempts to load PR template from repository or custom path
+ * Falls back to default GitHub template if not found
  */
 async function getPRTemplate(): Promise<string | null> {
   try {
     const repoRoot = await getRepoRoot()
-    const templatePath = path.join(repoRoot, '.github', 'PULL_REQUEST_TEMPLATE.md')
-    const template = await fs.readFile(templatePath, 'utf-8')
+    const config = vscode.workspace.getConfiguration('commitPilot')
+    const customTemplatePath = config.get<string>('customPullRequestTemplate')
 
+    // Try custom template first if configured
+    if (customTemplatePath) {
+      const fullCustomPath = path.join(repoRoot, customTemplatePath)
+      try {
+        const template = await fs.readFile(fullCustomPath, 'utf-8')
+        return DEFAULT_PROMPTS.GET_PR_TEMPLATE_PROMPT.replace('{template}', template)
+      } catch (error) {
+        vscode.window.showWarningMessage(`Could not load custom PR template from ${customTemplatePath}. Falling back to default template.`)
+      }
+    }
+
+    // Fall back to default GitHub template location
+    const defaultTemplatePath = path.join(repoRoot, '.github', 'PULL_REQUEST_TEMPLATE.md')
+    const template = await fs.readFile(defaultTemplatePath, 'utf-8')
     return DEFAULT_PROMPTS.GET_PR_TEMPLATE_PROMPT.replace('{template}', template)
   } catch {
     return null
