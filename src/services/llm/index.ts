@@ -1,9 +1,9 @@
 /**
  * LLM Service
- * 
+ *
  * Provides a unified interface for interacting with different LLM providers
- * (OpenAI and Groq) with support for structured output and learning mode.
- * 
+ * (OpenAI, Groq and Google Gemini) with support for structured output and learning mode.
+ *
  * Features:
  * - Provider configuration management
  * - Learning mode with example-based prompting
@@ -15,6 +15,7 @@ import { PromptTemplate } from '@langchain/core/prompts'
 import { RunnableSequence } from '@langchain/core/runnables'
 import { ChatGroq } from '@langchain/groq'
 import { ChatOpenAI } from '@langchain/openai'
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { z } from 'zod'
 import * as vscode from 'vscode'
@@ -48,7 +49,7 @@ export class LLMService {
 
   /**
    * Initializes LLM service with configured provider
-   * Supports both OpenAI and Groq providers
+   * Supports OpenAI, Groq, and Google Generative AI providers
    */
   constructor() {
     const { apiKey, modelName } = this.getConfig()
@@ -56,12 +57,21 @@ export class LLMService {
       vscode.workspace.getConfiguration('commitPilot').get<LLMProvider>('provider') ||
       DEFAULT_PROVIDER
 
-    this.model =
-      provider === 'groq'
-        ? new ChatGroq({ apiKey, modelName })
-        : new ChatOpenAI({ apiKey, modelName })
+    switch (provider) {
+      case 'groq':
+        this.model = new ChatGroq({ apiKey, modelName, temperature: 0.5 })
+        break
+      case 'googleGenAI':
+        this.model = new ChatGoogleGenerativeAI({
+          apiKey,
+          modelName,
+          temperature: 0.5,
+        })
+        break
+      default:
+        this.model = new ChatOpenAI({ apiKey, modelName, temperature: 0.5 })
+    }
   }
-
   /**
    * Enhances prompts with recent commit examples when learning mode is enabled
    * @param basePrompt - Original prompt to enhance
@@ -117,6 +127,8 @@ ${latestCommit.message}
 
     const chain = RunnableSequence.from([promptTemplate, this.model])
 
-    return chain.invoke(input).then((response) => response.content) as Promise<T extends z.ZodType ? z.infer<T> : string>
+    return chain.invoke(input).then((response) => response.content) as Promise<
+      T extends z.ZodType ? z.infer<T> : string
+    >
   }
 }

@@ -4,14 +4,15 @@ export const DEFAULT_PROVIDER: LLMProvider = 'groq'
 
 export const PROVIDER_MODELS: Record<LLMProvider, ModelName> = {
   groq: 'llama-3.1-70b-versatile',
-  openai: 'gpt-4o-mini'
+  openai: 'gpt-4o-mini',
+  googleGenAI: 'gemini-1.5-flash-002'
 } as const
 
 export const PROVIDER_NAMES = {
   groq: 'Groq',
-  openai: 'OpenAI'
+  openai: 'OpenAI',
+  googleGenAI: 'Google Gemini'
 } as const
-
 export const DEFAULT_PROMPTS = {
   REFINE_PR_DESCRIPTION_PROMPT: `Refine the following PR description while preserving its exact section structure. Keep all headers and formatting intact.
 
