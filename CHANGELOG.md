@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.1] - 2024-11-05
+
 ### Fixed
 
 - Fixed issue where the pull request feedback loop select box will be disappeared if switch to another tab
