@@ -6,6 +6,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the issue with generating commit messages via Google Generative AI, which was previously unusable due to the Langchain package.
+
+### Changed
+
+- Use AI SDK (@ai-sdk/openai, @ai-sdk/google, @ai-sdk/groq) instead of Langchain package
+
 ## [0.1.1] - 2024-11-05
 
 ### Fixed
