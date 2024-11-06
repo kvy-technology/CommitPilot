@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.2] - 2024-11-06
+
 ### Fixed
 
 - Fixed the issue with generating commit messages via Google Generative AI, which was previously unusable due to the Langchain package.
