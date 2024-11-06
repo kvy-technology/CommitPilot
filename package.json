@@ -166,10 +166,11 @@
   },
   "packageManager": "pnpm@9.11.0",
   "dependencies": {
+    "@ai-sdk/google": "^0.0.55",
+    "@ai-sdk/groq": "^0.0.3",
+    "@ai-sdk/openai": "^0.0.72",
     "@langchain/core": "^0.3.15",
-    "@langchain/google-genai": "^0.1.2",
-    "@langchain/groq": "^0.1.2",
-    "@langchain/openai": "^0.3.11",
+    "ai": "^3.4.33",
     "dotenv": "^16.4.5",
     "langchain": "^0.3.4",
     "zod": "^3.23.8"

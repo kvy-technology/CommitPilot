@@ -10,25 +10,25 @@
  * - Structured output parsing
  * - Dynamic prompt enhancement
  */
-
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createGroq } from '@ai-sdk/groq'
+import { createOpenAI } from '@ai-sdk/openai'
 import { PromptTemplate } from '@langchain/core/prompts'
-import { RunnableSequence } from '@langchain/core/runnables'
-import { ChatGroq } from '@langchain/groq'
-import { ChatOpenAI } from '@langchain/openai'
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
-import { BaseChatModel } from '@langchain/core/language_models/chat_models'
-import { z } from 'zod'
+import { generateObject, generateText } from 'ai'
 import * as vscode from 'vscode'
-import { LLMProvider, ProviderConfig } from '../../types'
+import { z } from 'zod'
 import { DEFAULT_PROVIDER, PROVIDER_MODELS } from '../../constants/llm'
+import { LLMProvider, ProviderConfig } from '../../types'
 import { getRecentCommits } from '../git'
 
 export class LLMService {
-  private model: BaseChatModel
+  private _temperature: number = 0.7
 
   /**
-   * Retrieves and validates LLM provider configuration from VS Code settings
-   * Throws error if API key is not configured
+   * Retrieves LLM configuration from VS Code settings
+   * @returns Provider configuration with API key and model name
+   * @throws Error if API key is not configured
+   *
    */
   private getConfig(): ProviderConfig {
     const config = vscode.workspace.getConfiguration('commitPilot')
@@ -48,10 +48,11 @@ export class LLMService {
   }
 
   /**
-   * Initializes LLM service with configured provider
-   * Supports OpenAI, Groq, and Google Generative AI providers
+   * Creates and returns an AI provider instance based on configuration
+   * @returns Configured AI provider
+   *
    */
-  constructor() {
+  private getProvider() {
     const { apiKey, modelName } = this.getConfig()
     const provider =
       vscode.workspace.getConfiguration('commitPilot').get<LLMProvider>('provider') ||
@@ -59,19 +60,19 @@ export class LLMService {
 
     switch (provider) {
       case 'groq':
-        this.model = new ChatGroq({ apiKey, modelName, temperature: 0.5 })
-        break
+        return createGroq({ apiKey })(modelName)
       case 'googleGenAI':
-        this.model = new ChatGoogleGenerativeAI({
-          apiKey,
-          modelName,
-          temperature: 0.5,
-        })
-        break
+        return createGoogleGenerativeAI({ apiKey })(modelName)
       default:
-        this.model = new ChatOpenAI({ apiKey, modelName, temperature: 0.5 })
+        return createOpenAI({ apiKey })(modelName)
     }
   }
+
+  /**
+   * Initializes LLM service with configured provider
+   * Supports OpenAI, Groq, and Google Generative AI providers
+   */
+  constructor() { }
   /**
    * Enhances prompts with recent commit examples when learning mode is enabled
    * @param basePrompt - Original prompt to enhance
@@ -101,10 +102,10 @@ ${latestCommit.message}
   /**
    * Generates responses using configured LLM
    * @param prompt - Template string for generation
-   * @param schema - Optional Zod schema for structured output
-   * @param input - Context data for prompt
-   * @param disableExamples - Flag to disable learning mode
-   * @returns Generated response, parsed according to schema if provided
+   * @param schema - Optional Zod schema for structured output validation and parsing
+   * @param input - Context data to be injected into the prompt template
+   * @param disableExamples - Flag to bypass learning mode examples
+   * @returns Generated response, either as structured data matching schema or raw text
    */
   async generate<T extends z.ZodType>({
     prompt,
@@ -118,17 +119,29 @@ ${latestCommit.message}
     disableExamples?: boolean
   }): Promise<T extends z.ZodType ? z.infer<T> : string> {
     const enhancedPrompt = await this.getPromptWithExamples(prompt, disableExamples)
+    const provider = this.getProvider()
+
+    // Format the prompt with input variables
     const promptTemplate = PromptTemplate.fromTemplate(enhancedPrompt)
+    const formattedPrompt = await promptTemplate.format(input)
 
     if (schema) {
-      const chain = RunnableSequence.from([promptTemplate, this.model.withStructuredOutput(schema)])
-      return chain.invoke(input)
+      const { object } = await generateObject({
+        model: provider,
+        prompt: formattedPrompt,
+        schema,
+        temperature: this._temperature,
+      })
+
+      return object as z.infer<T>
     }
 
-    const chain = RunnableSequence.from([promptTemplate, this.model])
+    const { text } = await generateText({
+      model: provider,
+      prompt: formattedPrompt,
+      temperature: this._temperature,
+    })
 
-    return chain.invoke(input).then((response) => response.content) as Promise<
-      T extends z.ZodType ? z.infer<T> : string
-    >
+    return text as T extends z.ZodType ? z.infer<T> : string
   }
 }
