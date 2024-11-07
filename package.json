@@ -52,6 +52,10 @@
       {
         "command": "commit-pilot.openSettings",
         "title": "CommitPilot: Open Settings"
+      },
+      {
+        "command": "commit-pilot.createRelease",
+        "title": "CommitPilot: Create Release"
       }
     ],
     "menus": {
