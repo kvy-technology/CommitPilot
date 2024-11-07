@@ -7,28 +7,17 @@
  * - Keep a Changelog format compliance
  * - Interactive version selection through VS Code UI
  */
-import * as vscode from 'vscode'
 import * as fs from 'fs/promises'
 import * as path from 'path'
-import { getWorkspaceFolder } from '../utils/workspace'
-import { LLMService } from '../services/llm'
-import { getRecentCommits } from '../services/git'
+import * as vscode from 'vscode'
+import { DEFAULT_CHANGELOG } from '../constants/git'
 import { KVY_PRESET } from '../constants/preset'
+import { getRecentCommits } from '../services/git'
+import { LLMService } from '../services/llm'
 import { VersionBump } from '../types'
-import { ChangelogEntrySchema } from '../constants/schema'
-import { z } from 'zod'
+import { getWorkspaceFolder } from '../utils/workspace'
 
-// Template for new changelog files following Keep a Changelog format
-const DEFAULT_CHANGELOG = `# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-`
+const getChangelogPath = () => path.join(getWorkspaceFolder(), 'CHANGELOG.md')
 
 /**
  * Updates or creates CHANGELOG.md with new release information
@@ -38,8 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * @returns {Promise<void>}
  */
 export async function updateChangelog(newVersion: string): Promise<void> {
-  const workspaceFolder = getWorkspaceFolder()
-  const changelogPath = path.join(workspaceFolder, 'CHANGELOG.md')
+  const changelogPath = getChangelogPath()
 
   // Initialize or load existing changelog
   let existingContent
@@ -150,59 +138,70 @@ function bumpVersion(version: string, type: VersionBump): string {
  *
  * This function generates a changelog entry based on the provided commit messages, formats it in Markdown, and appends it to the "Unreleased" section of the CHANGELOG.md file.
  *
- * @param diff - An array of commit diffs containing the commit messages to be included in the changelog.
+
+ * @param newChangelog - A string containing the new changelog entries to be added.
  * @returns A Promise that resolves when the CHANGELOG.md file has been updated.
  */
 export async function updateUnreleasedChangelog(newChangelog: string): Promise<void> {
-  const workspaceFolder = getWorkspaceFolder();
-  const changelogPath = path.join(workspaceFolder, 'CHANGELOG.md');
+  const workspaceFolder = getWorkspaceFolder()
+  const changelogPath = path.join(workspaceFolder, 'CHANGELOG.md')
 
-  // Read or create CHANGELOG.md
-  let existingContent = DEFAULT_CHANGELOG;
+  let existingContent = DEFAULT_CHANGELOG
   try {
-    existingContent = await fs.readFile(changelogPath, 'utf8');
+    existingContent = await fs.readFile(changelogPath, 'utf8')
   } catch { }
 
-  // Extract existing unreleased content
-  const unreleasedMatch = existingContent.match(/## \[Unreleased\]\n([\s\S]*?)(?=\n## \[|$)/);
-  const existingUnreleased = unreleasedMatch ? unreleasedMatch[1].trim() : '';
+  const unreleasedMatch = existingContent.match(/## \[Unreleased\]\n([\s\S]*?)(?=\n## \[|$)/)
+  const existingUnreleased = unreleasedMatch ? unreleasedMatch[1].trim() : ''
 
-  // Merge existing and new changes
-  let mergedChanges = '';
+  let mergedChanges = ''
   if (existingUnreleased) {
-    mergedChanges = `${existingUnreleased}\n\n${newChangelog}`;
+    mergedChanges = `${existingUnreleased}\n\n${newChangelog}`
   } else {
-    mergedChanges = newChangelog;
+    mergedChanges = newChangelog
   }
 
-  // Update CHANGELOG.md with merged changes
   const updatedContent = existingContent.replace(
     /## \[Unreleased\][\s\S]*?(?=\n## \[|$)/,
     `## [Unreleased]\n\n${mergedChanges}`
-  );
+  )
 
-  await fs.writeFile(changelogPath, updatedContent, 'utf8');
+  await fs.writeFile(changelogPath, updatedContent, 'utf8')
 }
 
+/**
+ * Checks if a CHANGELOG.md file exists in the current workspace.
+ *
+ * @returns A Promise that resolves to `true` if the CHANGELOG.md file exists, or `false` otherwise.
+ */
+export async function isChangelogExists(): Promise<boolean> {
+  const changelogPath = getChangelogPath()
+
+  try {
+    await fs.access(changelogPath)
+    return true
+  } catch {
+    return false
+  }
+}
 
 /**
- * Formats a set of changelog entries into a Markdown-formatted string.
+ * Creates a default CHANGELOG.md file in the current workspace.
  *
- * @param entries - The changelog entries to format.
- * @returns A Markdown-formatted string representing the changelog entries.
+ * @returns A Promise that resolves when the CHANGELOG.md file has been created.
  */
-export function formatChangelogEntries(entries: z.infer<typeof ChangelogEntrySchema>): string {
-  const sections = [
-    { title: 'Added', items: entries.added },
-    { title: 'Changed', items: entries.changed },
-    { title: 'Deprecated', items: entries.deprecated },
-    { title: 'Removed', items: entries.removed },
-    { title: 'Fixed', items: entries.fixed },
-    { title: 'Security', items: entries.security }
-  ];
+export async function createDefaultChangelog() {
+  const changelogPath = getChangelogPath()
 
-  return sections
-    .filter(section => section.items?.length)
-    .map(section => `### ${section.title}\n${section.items!.map(item => `- ${item}`).join('\n')}`)
-    .join('\n\n');
+  await fs.writeFile(changelogPath, DEFAULT_CHANGELOG, 'utf8')
+}
+
+/**
+ * Opens the CHANGELOG.md file in the current workspace.
+ *
+ * This function retrieves the current workspace folder, constructs the path to the CHANGELOG.md file, and opens the file in the Visual Studio Code editor.
+ */
+export async function openChangelogFile() {
+  const changelogPath = getChangelogPath()
+  await vscode.workspace.openTextDocument(changelogPath)
 }

@@ -76,7 +76,34 @@ Description:
 \`\`\`
 {description}
 \`\`\``,
-  GENERATE_CHANGELOG_PROMPT: `Generate a changelog entry for the Unreleased section based on the provided pull request description and code changes. Focus on user-facing changes and their impact:
+  GENERATE_CHANGELOG_PROMPT: `Generate a changelog entry for the Unreleased section based on the provided pull request description and code changes. Format the output in Keep a Changelog style with these sections:
+
+### Added
+
+- New features or capabilities
+
+### Changed
+
+- Changes to existing functionality
+
+### Deprecated
+
+- Features marked for removal
+
+### Removed
+
+- Removed features
+
+### Fixed
+
+- Bug fixes
+
+### Security
+
+- Security vulnerability fixes
+
+Only include sections that have relevant changes. Each bullet point should be clear and user-focused. The changelog entry should be concise and to the point, no dummy. It should not include unnecessary details or explanations.
+Do not use emojis or any other non-standard formatting. The output should be in plain text.
 
 PR Description:
 \`\`\`
@@ -87,7 +114,8 @@ Commit Messages:
 \`\`\`
 {commits}
 \`\`\``,
-  REFINE_CHANGELOG_PROMPT: `Improve the changelog entries based on the feedback while maintaining context from the PR description and changes.
+
+  REFINE_CHANGELOG_PROMPT: `Improve the changelog entries based on the feedback while maintaining the Keep a Changelog format. Keep the existing structure and enhance the content based on the feedback.
 
 Feedback:
 \`\`\`
@@ -108,4 +136,5 @@ Code Changes:
 \`\`\`
 {diff}
 \`\`\``
+
 }
