@@ -21,10 +21,10 @@ Git Diff:
 \`\`\``,
   GENERATE_PR_DESCRIPTION_PROMPT: `Generate a pull request description based on the git diff output and the message provided. The pull request description has three sections: What happened, Insight, and Proof Of Work.
 
-- What happened section provides a brief review and concise description of the changes introduced by the pull request. Below is the format of this section (delimited by triple backticks):
-
 \`\`\`
 ## What happened
+
+[What happened section provides a brief review and concise description of the changes introduced by the pull request]
 
 - Issue: [Issue number, e.g., #1]
 
@@ -33,19 +33,21 @@ This PR aims to [concisely describe the changes introduced by the PR]. The main 
 - [Change 1]
 - [Change 2]
 - ...
-\`\`\`
 
-- Insight section explains thoroughly the difference (changes from previous branch compare to the current one) from git diff. When appropriate, consider using Mermaid script to create flowcharts or diagrams that visually represent the changes or the logic flow. Below is the format of this section (delimited by triple backticks):
-
-\`\`\`
 ## Insight
-Explain the changes thoroughly
-\`\`\`
 
-- Proof Of Work section is left blank. Simply add the following text: "## Proof Of Work 📹"
+This section explains thoroughly the difference (changes from previous branch compare to the current one) from git diff (but don't include the diff itself).
+When appropriate:
+- Use bullet points to list the changes and their impact.
+- Consider using Mermaid script to create flowcharts or diagrams that visually represent the changes or the logic flow.
+
+## Proof Of Work 📹
+
+[Proof Of Work section is left blank]
+
+\`\`\`
 
 Your goal is to encourage self-reliance and comprehension through interactive support. To achieve this, generate a pull request description that is clear, concise, and thorough in explaining the changes and the reasoning behind them.
-
 The description should provide reviewers with a comprehensive understanding of the pull request's purpose and impact. Use simple and straightforward words, avoiding buzzwords and overly complex vocabulary. Keep it concise.
 
 Requirements:
@@ -73,5 +75,37 @@ To extract the necessary information:
 Description:
 \`\`\`
 {description}
+\`\`\``,
+  GENERATE_CHANGELOG_PROMPT: `Generate a changelog entry for the Unreleased section based on the provided pull request description and code changes. Focus on user-facing changes and their impact:
+
+PR Description:
+\`\`\`
+{description}
+\`\`\`
+
+Commit Messages:
+\`\`\`
+{commits}
+\`\`\``,
+  REFINE_CHANGELOG_PROMPT: `Improve the changelog entries based on the feedback while maintaining context from the PR description and changes.
+
+Feedback:
+\`\`\`
+{refinementInput}
+\`\`\`
+
+Current Changelog:
+\`\`\`
+{currentChangelog}
+\`\`\`
+
+PR Description:
+\`\`\`
+{description}
+\`\`\`
+
+Code Changes:
+\`\`\`
+{diff}
 \`\`\``
 }

@@ -13,6 +13,7 @@ export const PROVIDER_NAMES = {
   openai: 'OpenAI',
   googleGenAI: 'Google Gemini'
 } as const
+
 export const DEFAULT_PROMPTS = {
   REFINE_PR_DESCRIPTION_PROMPT: `Refine the following PR description while preserving its exact section structure. Keep all headers and formatting intact.
 
