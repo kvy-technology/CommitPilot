@@ -16,6 +16,7 @@ import { COMMANDS } from './constants/commands'
 import { setApiKey } from './commands/set-api-key'
 import { generatePRDescription } from './commands/generate-pr-description'
 import { openSettings } from './commands/open-settings'
+import { createReleaseCommand } from './commands/create-release'
 
 /**
  * Extension Activation Handler
@@ -49,13 +50,20 @@ export function activate(context: vscode.ExtensionContext) {
 		openSettings
 	)
 
+	// Register Create Release command
+	const createReleaseDisposable = vscode.commands.registerCommand(
+		COMMANDS.CREATE_RELEASE,
+		createReleaseCommand
+	)
+
 	// Add all disposables to extension context for proper cleanup
 	context.subscriptions.push(
 		fullCommitDisposable,
 		simpleCommitDisposable,
 		setApiKeyDisposable,
 		openSettingsDisposable,
-		generatePRDescriptionDisposable
+		generatePRDescriptionDisposable,
+		createReleaseDisposable
 	)
 }
 
