@@ -7,21 +7,9 @@
 
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import * as vscode from 'vscode'
+import { getWorkspaceFolder } from '../utils/workspace'
 
 const execAsync = promisify(exec)
-
-/**
- * Retrieves the current workspace folder path
- * @throws Error if no workspace is open
- */
-const getWorkspaceFolder = (): string => {
-  const workspaceFolders = vscode.workspace.workspaceFolders
-  if (!workspaceFolders) {
-    throw new Error('No workspace folder found')
-  }
-  return workspaceFolders[0].uri.fsPath
-}
 
 /**
  * Executes a Git command in the current workspace
