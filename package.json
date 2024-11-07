@@ -39,7 +39,7 @@
       },
       {
         "command": "commit-pilot.generate-pr-description",
-        "title": "CommitPilot: Generate PR Description",
+        "title": "CommitPilot: Generate Pull Request Description",
         "icon": {
           "light": "./resources/icons/pr-description.svg",
           "dark": "./resources/icons/pr-description-dark.svg"

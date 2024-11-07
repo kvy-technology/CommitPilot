@@ -14,7 +14,7 @@ import {
 } from './commands/generate-commit-message'
 import { COMMANDS } from './constants/commands'
 import { setApiKey } from './commands/set-api-key'
-import { generatePRDescription } from './commands/generate-pr-description'
+import { generatePRDescription } from './commands/generate-pull-request-description'
 import { openSettings } from './commands/open-settings'
 import { createReleaseCommand } from './commands/create-release'
 
