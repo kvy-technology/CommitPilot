@@ -122,3 +122,70 @@ export const getDetailedBranchDiff = async (baseBranch: string): Promise<Array<{
   }
   return commits
 }
+
+/**
+ * Gets the latest release tag from git
+ * @returns Latest semver tag or null if no releases exist
+ */
+export const getLastRelease = async (): Promise<string | null> => {
+  try {
+    // Get all tags sorted by version (v1.0.0, v2.0.0, etc)
+    const output = await execGitCommand('tag --sort=-v:refname')
+    const tags = output.split('\n').filter(tag => tag.match(/^v\d+\.\d+\.\d+$/))
+
+    return tags.length > 0 ? tags[0] : null
+  } catch (error) {
+    console.error('CommitPilot: No release tags found')
+    return null
+  }
+}
+
+/**
+ * Creates an annotated Git tag with release notes
+ * @param version - Version number to tag (e.g. v1.0.0)
+ * @param releaseNotes - Generated release notes for tag annotation
+ */
+export const createGitTag = async (version: string, releaseNotes: string): Promise<void> => {
+  // Create annotated tag with release notes
+  await execGitCommand(`tag -a ${version} -m "${releaseNotes}"`)
+
+  // Push tag to remote
+  await execGitCommand(`push origin ${version}`)
+}
+
+/**
+ * Validates repository state for release
+ * @throws Error if repository state is invalid
+ */
+export const validateRepositoryState = async (): Promise<void> => {
+  const hasChanges = await execGitCommand('status --porcelain');
+  if (hasChanges) {
+    throw new Error('Repository has uncommitted changes');
+  }
+
+  const hasRemote = await execGitCommand('remote');
+  if (!hasRemote) {
+    throw new Error('No git remote configured for this repository');
+  }
+}
+
+/**
+ * Commits version bump changes
+ * @param version - New version number
+ */
+export const commitVersionBump = async (version: string): Promise<void> => {
+  await execGitCommand('add package.json CHANGELOG.md');
+  await execGitCommand(`commit -m "chore: release ${version}"`);
+}
+
+/**
+ * Creates and pushes release
+ * @param version - Version to release
+ * @param releaseNotes - Generated release notes
+ */
+export const createRelease = async (version: string, releaseNotes: string): Promise<void> => {
+  await commitVersionBump(version);
+  await createGitTag(version, releaseNotes);
+  await execGitCommand(`push origin ${version}`);
+  await execGitCommand('push');
+}

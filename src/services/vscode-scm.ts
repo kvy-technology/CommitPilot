@@ -7,6 +7,7 @@
  */
 
 import * as vscode from 'vscode'
+import { getAllBranches, getCurrentBranch } from './git'
 
 /**
  * Retrieves VS Code's built-in Git extension API
@@ -103,4 +104,33 @@ export async function openPRCreationPage(description: string, baseBranch: string
     'PR description copied to clipboard! Opening PR creation page...'
   )
   await vscode.env.openExternal(vscode.Uri.parse(prUrl))
+}
+
+
+/**
+ * Prompts the user to select a base branch for a pull request from a list of available branches, excluding the current branch.
+ *
+ * @returns {Promise<string | undefined>} The selected base branch, or `undefined` if the user cancels the selection.
+ */
+export async function selectBaseBranch() {
+  try {
+    const branches = await getAllBranches()
+    const currentBranch = await getCurrentBranch()
+
+    const selectableBranches = branches.filter((branch) => branch !== currentBranch)
+
+    const selectedBranch = await vscode.window.showQuickPick(selectableBranches, {
+      placeHolder: 'Select the base branch',
+      title: 'Select the base branch which the current branch will be compared to',
+    })
+
+    if (!selectedBranch) {
+      console.log(`CommitPilot: User cancelled the selection`)
+      return
+    }
+
+    return selectedBranch
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to generate pull request description: ${error}`)
+  }
 }
