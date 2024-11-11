@@ -130,6 +130,11 @@
         "commitPilot.apiKey": {
           "type": "string",
           "description": "API key for the selected provider"
+        },
+        "commitpilot.githubToken": {
+          "type": "string",
+          "description": "GitHub Personal Access Token for creating releases",
+          "scope": "window"
         }
       }
     }

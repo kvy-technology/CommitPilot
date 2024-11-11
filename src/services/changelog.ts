@@ -11,13 +11,19 @@ import * as fs from 'fs/promises'
 import * as path from 'path'
 import * as vscode from 'vscode'
 import { DEFAULT_CHANGELOG } from '../constants/git'
-import { KVY_PRESET } from '../constants/preset'
-import { getRecentCommits } from '../services/git'
-import { LLMService } from '../services/llm'
 import { VersionBump } from '../types'
 import { getWorkspaceFolder } from '../utils/workspace'
 
 const getChangelogPath = () => path.join(getWorkspaceFolder(), 'CHANGELOG.md')
+
+export const getChangelogContent = async () => {
+  const changelogPath = getChangelogPath()
+  try {
+    return await fs.readFile(path.resolve(__dirname, changelogPath), 'utf8')
+  } catch (error) {
+    return DEFAULT_CHANGELOG
+  }
+}
 
 /**
  * Updates or creates CHANGELOG.md with new release information
@@ -26,41 +32,30 @@ const getChangelogPath = () => path.join(getWorkspaceFolder(), 'CHANGELOG.md')
  * @throws {Error} When file operations fail
  * @returns {Promise<void>}
  */
-export async function updateChangelog(newVersion: string): Promise<void> {
+export async function updateChangelog(newVersion: string): Promise<string> {
   const changelogPath = getChangelogPath()
 
   // Initialize or load existing changelog
-  let existingContent
-  try {
-    existingContent = await fs.readFile(changelogPath, 'utf8')
-  } catch (error) {
-    existingContent = DEFAULT_CHANGELOG
-  }
+  let changelogContent = await getChangelogContent()
 
-  // Generate AI-powered changelog content from recent commit history
-  const llm = new LLMService()
-  const commits = await getRecentCommits(50)
-  const commitMessages = commits.map((commit) => commit.message).join('\n')
-
-  const changelogContent = await llm.generate({
-    prompt: KVY_PRESET.GENERATE_CHANGELOG_PROMPT,
-    input: {
-      commits: commitMessages,
-    },
-    disableExamples: true,
-  })
+  // Get unreleased content
+  const unreleasedMatch = changelogContent.match(/## \[Unreleased\]\n([\s\S]*?)(?=\n## \[|$)/)
+  const unreleasedContent = unreleasedMatch ? unreleasedMatch[1].trim() : ''
 
   // Format new version entry with ISO date
   const date = new Date().toISOString().split('T')[0]
-  const newEntry = `\n## [${newVersion}] - ${date}\n\n${changelogContent}\n`
+  const newEntry = `\n## [${newVersion}] - ${date}\n\n${unreleasedContent}\n`
 
-  // Insert new version while preserving Unreleased section
-  const updatedContent = existingContent.replace(
-    /## \[Unreleased\]/,
-    `## [Unreleased]\n${newEntry}`
+  // Replace content between Unreleased and first version entry
+  const updatedContent = changelogContent.replace(
+    /## \[Unreleased\][\s\S]*?(?=\n## \[|$)/,
+    `## [Unreleased]\n\n${newEntry}`
   )
 
   await fs.writeFile(changelogPath, updatedContent, 'utf8')
+
+  // Return the new version's changelog entry
+  return newEntry
 }
 
 /**
@@ -95,9 +90,14 @@ export async function determineNextVersion(): Promise<string> {
       value: 'minor',
     },
     {
-      label: '$(arrow-small-down) Patch',
+      label: '$(arrow-small-right) Patch',
       description: `${currentVersion} → ${bumpVersion(currentVersion, 'patch')}`,
       value: 'patch',
+    },
+    {
+      label: '$(pencil) Custom Version',
+      description: 'Enter your own version number',
+      value: 'custom',
     },
   ]
 
@@ -110,9 +110,24 @@ export async function determineNextVersion(): Promise<string> {
     throw new Error('Version selection cancelled')
   }
 
+  if (selected.value === 'custom') {
+    const customVersion = await vscode.window.showInputBox({
+      prompt: 'Enter version number (without v prefix)',
+      placeHolder: '1.0.0',
+      validateInput: (value) => {
+        return /^\d+\.\d+\.\d+$/.test(value) ? null : 'Please enter a valid semver (e.g. 1.0.0)'
+      },
+    })
+
+    if (!customVersion) {
+      throw new Error('Version input cancelled')
+    }
+
+    return `v${customVersion}`
+  }
+
   return `v${bumpVersion(currentVersion, selected.value as VersionBump)}`
 }
-
 /**
  * Calculates the next version number based on semantic versioning rules
  *
@@ -204,4 +219,21 @@ export async function createDefaultChangelog() {
 export async function openChangelogFile() {
   const changelogPath = getChangelogPath()
   await vscode.workspace.openTextDocument(changelogPath)
+}
+
+/**
+ * Updates version in package.json
+ * @param version - New version number (without 'v' prefix)
+ */
+export const updatePackageVersion = async (version: string): Promise<void> => {
+  const workspaceFolder = getWorkspaceFolder()
+  const packageJsonPath = path.join(workspaceFolder, 'package.json')
+
+  try {
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
+    packageJson.version = version.replace('v', '')
+    await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf8')
+  } catch (error) {
+    console.log('CommitPilot: No package.json found, skipping version bump')
+  }
 }

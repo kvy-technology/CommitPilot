@@ -15,10 +15,9 @@ import { PRTitleSchema } from '../constants/schema'
 import {
   createDefaultChangelog,
   isChangelogExists,
-  openChangelogFile,
-  updateUnreleasedChangelog,
+  updateUnreleasedChangelog
 } from '../services/changelog'
-import { getDetailedBranchDiff, getRepoRoot } from '../services/git'
+import { execGitCommand, getDetailedBranchDiff, getRepoRoot, syncWithRemote } from '../services/git'
 import { LLMService } from '../services/llm'
 import { openPRCreationPage, selectBaseBranch } from '../services/vscode-scm'
 import { delay } from '../utils'
@@ -46,6 +45,10 @@ enum ChangelogFeedbackOption {
  * 5. Open pull request creation page
  */
 export async function generatePRDescription() {
+  // Sync current branch with remote first
+  vscode.window.showInformationMessage('Commit Pilot: Syncing branch with remote...')
+  await syncWithRemote()
+
   // Get base branch for pull request comparison
   const baseBranch = await selectBaseBranch()
   if (!baseBranch) {
@@ -176,13 +179,6 @@ export async function generatePRDescription() {
       disableExamples: true,
     })
 
-    // Open pull request creation page with generated content
-    vscode.window.showInformationMessage('Commit Pilot: Opening pull request creation page...')
-    await openPRCreationPage(description, baseBranch, title.title)
-    vscode.window.showInformationMessage(
-      'Commit Pilot: Pull request description and title generated successfully! Ready to create Pull request.'
-    )
-
     // Close the pull request creation page
     closeTemporaryDocuments()
 
@@ -192,20 +188,6 @@ export async function generatePRDescription() {
 
       const isProjectHasChangelog = await isChangelogExists()
 
-      if (!isProjectHasChangelog) {
-        const shouldCreateDefaultChangelog = await vscode.window.showWarningMessage(
-          'No CHANGELOG.md found. Would you like to create a default one?',
-          'Yes',
-          'No'
-        )
-        if (shouldCreateDefaultChangelog === 'Yes') {
-          await createDefaultChangelog()
-        } else {
-          return
-        }
-      }
-
-      // If changelog exists, ask for confirmation
       const shouldUpdate = await vscode.window.showInformationMessage(
         'Would you like to update the changelog?',
         'Yes',
@@ -213,17 +195,44 @@ export async function generatePRDescription() {
       )
 
       if (shouldUpdate === 'Yes') {
-        await generateChangelogFeedbackLoop({
-          pullRequestDescription: description,
-          diff,
-        })
-      } else {
-        return
+        if (!isProjectHasChangelog) {
+          const shouldCreateDefaultChangelog = await vscode.window.showWarningMessage(
+            'No CHANGELOG.md found. Would you like to create a default one?',
+            'Yes',
+            'No'
+          )
+          if (shouldCreateDefaultChangelog === 'Yes') {
+            // Create default changelog
+            await createDefaultChangelog()
+            // Generate changelog feedback loop
+            await generateChangelogFeedbackLoop({
+              pullRequestDescription: description,
+              diff,
+            })
+          }
+        } else {
+          await generateChangelogFeedbackLoop({
+            pullRequestDescription: description,
+            diff,
+          })
+        }
+
+        // Add git commands to stage and commit changelog
+        await execGitCommand('add CHANGELOG.md')
+        await execGitCommand('commit -m "chore: update changelog"')
+        await execGitCommand('push')
       }
     } catch (error) {
       console.error(error)
       vscode.window.showErrorMessage(`Commit Pilot: Error generating changelog: ${error}`)
     }
+
+    // Open pull request creation page with generated content
+    vscode.window.showInformationMessage('Commit Pilot: Opening pull request creation page...')
+    await openPRCreationPage(description, baseBranch, title.title)
+    vscode.window.showInformationMessage(
+      'Commit Pilot: Pull request description and title generated successfully! Ready to create Pull request.'
+    )
   } catch (error) {
     console.error(error)
     vscode.window.showErrorMessage(`Error generating pull request description: ${error}`)
@@ -327,7 +336,7 @@ async function generateChangelogFeedbackLoop({
       await delay(1000)
 
       // Open the changelog file
-      openChangelogFile()
+      // openChangelogFile()
     } else if (feedback === ChangelogFeedbackOption.IMPROVE) {
       const refinementInput = await vscode.window.showInputBox({
         prompt: 'What would you like to improve in the changelog?',
