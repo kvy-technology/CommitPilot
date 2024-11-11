@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+
+## [v0.2.0] - 2024-11-11
+
 ### Added
 
 - Automated GitHub release creation using a Personal Access Token (PAT). The `createGithubRelease` command was implemented, including enhanced error handling and user feedback. The `package.json` file was updated to accommodate GitHub PAT configuration options. Modifications to the `createReleaseCommand` were made to detect GitHub repositories and utilize the new `createGithubRelease` command as needed.
