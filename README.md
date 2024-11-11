@@ -37,6 +37,28 @@ Generate comprehensive PR descriptions automatically with:
 
 ![CleanShot 2024-11-04 at 14 41 40](https://github.com/user-attachments/assets/5745d0fa-be21-4872-ba88-591546a1464b)
 
+### Create Releases
+
+```
+Generate Commit
+    |
+    v
+[Staged Changes] --> [AI Analysis] --> [Commit Message] --> [Git Commit]
+    |
+    v
+Generate Pull Request
+    |
+    v
+[Branch Diff] --> [AI Analysis] --> [PR Description Draft] --> [User Review/Refine] --> [Update Changelog] --> [Create PR]
+    |
+    v
+Create Release
+    |
+    v
+[Sync Remote] --> [Version Bump] --> [Update Changelog] --> [Create Git Tag] --> [Push Changes] --> [GitHub Release]
+
+```
+
 ## Configuration
 
 CommitPilot offers several configuration options to customize your experience:
