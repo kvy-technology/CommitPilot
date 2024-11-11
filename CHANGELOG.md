@@ -6,6 +6,30 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+```
+## Changelog
+
+### Added
+
+- Automated GitHub release creation using a Personal Access Token (PAT).  The `createGithubRelease` command was implemented, including enhanced error handling and user feedback. The `package.json` file was updated to accommodate GitHub PAT configuration options. Modifications to the `createReleaseCommand` were made to detect GitHub repositories and utilize the new `createGithubRelease` command as needed.
+- Default `CHANGELOG.md` file following the Keep a Changelog format.
+- Command to generate pull request descriptions (`generate-pull-request-description`).
+- Command to create releases (`createRelease`).
+- Semantic version bumping functionality, including custom version input.
+- Git tag creation for releases.  Tag messages are now escaped to handle special characters.
+- Release validation before creation, ensuring a clean repository state.
+- Changelog management service with AI-powered generation and interactive version selection.  The changelog service now includes the ability to update the package version.
+
+
+### Changed
+
+- Improved changelog generation process. Now uses a more structured approach and detailed prompts. The prompts are refined for clarity and structure, providing more specific instructions and examples.  The changelog now includes sections for added, changed, deprecated, removed, fixed, and security updates.
+- Refined pull request description generation process. Includes schema for title and description, input validation, enhanced error handling, and automatic synchronization with the remote repository prior to generation. Changelog updates are appended to the generated description following user confirmation.  The changelog update process now includes creation of a default changelog if one does not exist, and prompts for confirmation before updating an existing changelog.  The command was renamed to `generate-pull-request-description` for clarity.
+- Improved error handling and user feedback throughout the release process. More informative messages are displayed to the user.
+- Refactored code for improved organization and reusability. The `getWorkspaceFolder` function was relocated to a dedicated utility file. The default value of `disableExamples` in the LLM service was set to `true`. A `VersionBump` type was introduced to improve type safety.
+
+```
+
 ## [0.1.2] - 2024-11-06
 
 ### Fixed
