@@ -19,10 +19,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Changed
 
-- Improved changelog generation process. Now uses a more structured approach and detailed prompts. The prompts are refined for clarity and structure, providing more specific instructions and examples. The changelog now includes sections for added, changed, deprecated, removed, fixed, and security updates.
-- Refined pull request description generation process. Includes schema for title and description, input validation, enhanced error handling, and automatic synchronization with the remote repository prior to generation. Changelog updates are appended to the generated description following user confirmation. The changelog update process now includes creation of a default changelog if one does not exist, and prompts for confirmation before updating an existing changelog. The command was renamed to `generate-pull-request-description` for clarity.
+- Improved changelog generation process.
+- Refined pull request description generation process.
 - Improved error handling and user feedback throughout the release process. More informative messages are displayed to the user.
-- Refactored code for improved organization and reusability. The `getWorkspaceFolder` function was relocated to a dedicated utility file. The default value of `disableExamples` in the LLM service was set to `true`. A `VersionBump` type was introduced to improve type safety.
+- Refactored code for improved organization and reusability.
 
 ## [0.1.2] - 2024-11-06
 
