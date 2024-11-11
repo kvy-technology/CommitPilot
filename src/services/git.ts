@@ -1,27 +1,16 @@
 /**
  * Git Command Service
- * 
+ *
  * Provides a wrapper around Git CLI commands for repository operations.
  * Handles workspace detection and command execution in the correct context.
  */
 
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import * as vscode from 'vscode'
+import { getWorkspaceFolder } from '../utils/workspace'
+import { updatePackageVersion } from './changelog'
 
 const execAsync = promisify(exec)
-
-/**
- * Retrieves the current workspace folder path
- * @throws Error if no workspace is open
- */
-const getWorkspaceFolder = (): string => {
-  const workspaceFolders = vscode.workspace.workspaceFolders
-  if (!workspaceFolders) {
-    throw new Error('No workspace folder found')
-  }
-  return workspaceFolders[0].uri.fsPath
-}
 
 /**
  * Executes a Git command in the current workspace
@@ -119,7 +108,9 @@ export const getAllBranches = async (): Promise<string[]> => {
  * @param baseBranch - Base branch to compare against
  * @returns Array of commit objects with hash, message, and diff
  */
-export const getDetailedBranchDiff = async (baseBranch: string): Promise<Array<{ hash: string; message: string; diff: string }>> => {
+export const getDetailedBranchDiff = async (
+  baseBranch: string
+): Promise<Array<{ hash: string; message: string; diff: string }>> => {
   const commitHashes = await execGitCommand(`log ${baseBranch}...HEAD --format=%H`)
   const commits = []
 
@@ -129,8 +120,112 @@ export const getDetailedBranchDiff = async (baseBranch: string): Promise<Array<{
     commits.push({
       hash: hash.substring(0, 4),
       message: message.trim(),
-      diff: diff.trim()
+      diff: diff.trim(),
     })
   }
   return commits
+}
+
+/**
+ * Gets the latest release tag from git
+ * @returns Latest semver tag or null if no releases exist
+ */
+export const getLastRelease = async (): Promise<string | null> => {
+  try {
+    // Get all tags sorted by version (v1.0.0, v2.0.0, etc)
+    const output = await execGitCommand('tag --sort=-v:refname')
+    const tags = output.split('\n').filter((tag) => tag.match(/^v\d+\.\d+\.\d+$/))
+
+    return tags.length > 0 ? tags[0] : null
+  } catch (error) {
+    console.error('CommitPilot: No release tags found')
+    return null
+  }
+}
+
+/**
+ * Syncs current branch with remote by pulling latest changes
+ * @throws Error if sync fails or conflicts exist
+ */
+export const syncWithRemote = async (): Promise<void> => {
+  const currentBranch = await getCurrentBranch()
+
+  // Fetch latest changes from remote
+  await execGitCommand('fetch origin')
+
+  try {
+    // Check if branch exists on remote
+    const remoteBranchExists = await execGitCommand(`ls-remote --heads origin ${currentBranch}`)
+
+    if (!remoteBranchExists) {
+      // Branch doesn't exist on remote, push it
+      await execGitCommand(`push -u origin ${currentBranch}`)
+      return
+    }
+
+    // If branch exists, check if local is behind remote
+    const behindCount = await execGitCommand(`rev-list HEAD..origin/${currentBranch} --count`)
+    if (parseInt(behindCount) > 0) {
+      await execGitCommand('pull --rebase origin ' + currentBranch)
+    }
+  } catch (error) {
+    // If any command fails, push the branch to establish tracking
+    await execGitCommand(`push -u origin ${currentBranch}`)
+  }
+}
+
+/**
+ * Creates an annotated Git tag with release notes
+ * @param version - Version number to tag (e.g. v1.0.0)
+ * @param releaseNotes - Generated release notes for tag annotation
+ */
+export const createGitTag = async (version: string, releaseNotes: string): Promise<void> => {
+  // Escape special characters and wrap message in single quotes
+  const escapedNotes = releaseNotes.replace(/'/g, "'\\''").replace(/"/g, '\\"').trim()
+
+  // Create annotated tag with escaped release notes
+  await execGitCommand(`tag -a ${version} -m '${escapedNotes}'`)
+
+  // Push tag to remote
+  await execGitCommand(`push origin ${version}`)
+}
+
+/**
+ * Validates repository state for release
+ * @throws Error if repository state is invalid
+ */
+export const validateRepositoryState = async (): Promise<void> => {
+  const hasChanges = await execGitCommand('status --porcelain')
+  if (hasChanges) {
+    throw new Error('Repository has uncommitted changes')
+  }
+
+  const hasRemote = await execGitCommand('remote')
+  if (!hasRemote) {
+    throw new Error('No git remote configured for this repository')
+  }
+}
+
+/**
+ * Commits version bump changes
+ * @param version - New version number
+ */
+export const commitVersionBump = async (version: string): Promise<void> => {
+  await execGitCommand('add package.json CHANGELOG.md')
+  await execGitCommand(`commit -m "chore: release ${version}"`)
+}
+
+/**
+ * Creates and pushes release
+ * @param version - Version to release
+ * @param releaseNotes - Generated release notes
+ */
+export const createRelease = async (version: string, releaseNotes: string): Promise<void> => {
+  // Update package.json version first
+  await updatePackageVersion(version);
+
+  await commitVersionBump(version)
+  await createGitTag(version, releaseNotes)
+  await execGitCommand(`push origin ${version}`)
+  await execGitCommand('push')
 }

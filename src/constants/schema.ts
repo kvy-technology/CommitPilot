@@ -25,3 +25,12 @@ export const simpleCommitSchema = z.object({
 export const PRTitleSchema = z.object({
   title: z.string().describe('Provide a concise and descriptive title for the pull request'),
 })
+
+export const ChangelogEntrySchema = z.object({
+  added: z.array(z.string()).optional().describe('List of added features'),
+  changed: z.array(z.string()).optional().describe('List of changed features'),
+  deprecated: z.array(z.string()).optional().describe('List of deprecated features'),
+  removed: z.array(z.string()).optional().describe('List of removed features'),
+  fixed: z.array(z.string()).optional().describe('List of fixed bugs'),
+  security: z.array(z.string()).optional().describe('List of security vulnerabilities')
+}).describe('Structured changelog entries grouped by change type');

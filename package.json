@@ -39,7 +39,7 @@
       },
       {
         "command": "commit-pilot.generate-pr-description",
-        "title": "CommitPilot: Generate PR Description",
+        "title": "CommitPilot: Generate Pull Request Description",
         "icon": {
           "light": "./resources/icons/pr-description.svg",
           "dark": "./resources/icons/pr-description-dark.svg"
@@ -52,6 +52,10 @@
       {
         "command": "commit-pilot.openSettings",
         "title": "CommitPilot: Open Settings"
+      },
+      {
+        "command": "commit-pilot.createRelease",
+        "title": "CommitPilot: Create Release"
       }
     ],
     "menus": {
@@ -126,6 +130,11 @@
         "commitPilot.apiKey": {
           "type": "string",
           "description": "API key for the selected provider"
+        },
+        "commitpilot.githubToken": {
+          "type": "string",
+          "description": "GitHub Personal Access Token for creating releases",
+          "scope": "window"
         }
       }
     }

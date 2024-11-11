@@ -111,7 +111,7 @@ ${latestCommit.message}
     prompt,
     schema,
     input,
-    disableExamples,
+    disableExamples = true
   }: {
     prompt: string
     schema?: T

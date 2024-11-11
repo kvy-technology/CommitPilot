@@ -10,3 +10,7 @@ export interface ProviderConfig {
   modelName: ModelName
   apiKey: string
 }
+
+// Create-Release
+
+export type VersionBump = 'major' | 'minor' | 'patch'
