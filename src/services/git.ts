@@ -31,7 +31,6 @@ export const execGitCommand = async (command: string): Promise<string> => {
  */
 export const getStagedDiff = async (): Promise<string> => {
   const stagedFiles = await execGitCommand('diff --cached --name-only')
-
   const files = stagedFiles.split('\n').filter(Boolean)
 
   let diffOutput = ''
@@ -40,7 +39,8 @@ export const getStagedDiff = async (): Promise<string> => {
     if (file.endsWith('lock.json') || file.endsWith('.lock') || file.endsWith('lock.yaml')) {
       diffOutput += `${file}: [Lock file changes detected]\n`
     } else {
-      const fileDiff = await execGitCommand(`diff --cached ${file}`)
+      // Add -- before the file path to properly separate it from the git command
+      const fileDiff = await execGitCommand(`diff --cached -- "${file}"`)
       diffOutput += fileDiff + '\n'
     }
   }
