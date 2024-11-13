@@ -8,21 +8,24 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
-- Automated GitHub release creation using a Personal Access Token (PAT). The `createGithubRelease` command was implemented, including enhanced error handling and user feedback. The `package.json` file was updated to accommodate GitHub PAT configuration options. Modifications to the `createReleaseCommand` were made to detect GitHub repositories and utilize the new `createGithubRelease` command as needed.
-- Default `CHANGELOG.md` file following the Keep a Changelog format.
-- Command to generate pull request descriptions (`generate-pull-request-description`).
-- Command to create releases (`createRelease`).
+- Automated GitHub release creation using a Personal Access Token (PAT).
+- Improved command to generate pull request descriptions (`generate-pull-request-description`).
+- Added command to create releases (`createRelease`).
 - Semantic version bumping functionality, including custom version input.
 - Git tag creation for releases. Tag messages are now escaped to handle special characters.
 - Release validation before creation, ensuring a clean repository state.
-- Changelog management service with AI-powered generation and interactive version selection. The changelog service now includes the ability to update the package version.
+- Changelog management service with AI-powered generation and interactive version selection.
 
 ### Changed
 
 - Improved changelog generation process.
 - Refined pull request description generation process.
-- Improved error handling and user feedback throughout the release process. More informative messages are displayed to the user.
+- Improved error handling and user feedback throughout the release process
 - Refactored code for improved organization and reusability.
+
+### Fixed
+
+- Fixed the issue when checking for deleted files in the staged changes will break the diff output.
 
 ## [0.1.2] - 2024-11-06
 
