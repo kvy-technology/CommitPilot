@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-11-13
+
 ### Added
 
 - Automated GitHub release creation using a Personal Access Token (PAT).
