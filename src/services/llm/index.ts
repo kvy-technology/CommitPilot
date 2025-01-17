@@ -22,7 +22,7 @@ import { LLMProvider, ProviderConfig } from '../../types'
 import { getRecentCommits } from '../git'
 
 export class LLMService {
-  private _temperature: number = 0.7
+  private _temperature: number = 0.4
 
   /**
    * Retrieves LLM configuration from VS Code settings

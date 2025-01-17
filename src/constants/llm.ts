@@ -3,9 +3,9 @@ import { LLMProvider, ModelName } from '../types'
 export const DEFAULT_PROVIDER: LLMProvider = 'groq'
 
 export const PROVIDER_MODELS: Record<LLMProvider, ModelName> = {
-  groq: 'llama-3.1-70b-versatile',
+  groq: 'llama-3.3-70b-versatile',
   openai: 'gpt-4o-mini',
-  googleGenAI: 'gemini-1.5-flash-002'
+  googleGenAI: 'gemini-2.0-flash-exp'
 } as const
 
 export const PROVIDER_NAMES = {
@@ -24,17 +24,18 @@ Requirements:
 - Keep technical accuracy and objectivity
 - Preserve any existing Mermaid diagrams or formatting
 
-Requested improvements: {refinementInput}
+Requested improvements: <request-improvements>{refinementInput}</request-improvements>
 
 Current description:
-"""
+<current-description>
 {description}
-"""`,
+</current-description>`,
   GET_PR_TEMPLATE_PROMPT: `Generate a pull request description based on the git diff output and the message provided.
 
 Template to follow:
+<template>
 {template}
-
+</template>
 Your goal is to encourage self-reliance and comprehension through interactive support. Generate a pull request description that is clear, concise, and thorough in explaining the changes and their reasoning.
 
 The description should provide reviewers with a comprehensive understanding of the pull request's purpose and impact. Use simple and straightforward words, avoiding buzzwords and overly complex vocabulary. Keep it concise.
