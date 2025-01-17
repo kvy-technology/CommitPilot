@@ -6,6 +6,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Updated
+
+- Updated the LLM providers:
+
+  - Groq: llama-3.1-70b-versatile -> llama-3.3-70b-versatile
+  - Google GenAI: gemini-1.5-flash-002 -> gemini-2.0-flash-exp
+
+- Updated the temperature for the LLM providers: 0.7 -> 0.4
+- Updated the prompt template for the LLM providers (using XML format)
+
 ## [0.2.0] - 2024-11-13
 
 ### Added
